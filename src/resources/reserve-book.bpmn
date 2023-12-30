@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1psb3va" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.18.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.3.0">
+  <bpmn:process id="mj-Process_reserve-book" name="Reserve Book" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_19pfc8u</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_19pfc8u" sourceRef="StartEvent_1" targetRef="Activity_0ltor8a" />
+    <bpmn:userTask id="Activity_0ltor8a" name="Reserve Book">
+      <bpmn:incoming>Flow_19pfc8u</bpmn:incoming>
+      <bpmn:outgoing>Flow_0dnjtlg</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="Event_End" name="Reserve Book">
+      <bpmn:extensionElements>
+        <zeebe:ioMapping>
+          <zeebe:output source="=userIntent" target="reserve_book_end_state" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0w2ohjr</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0dnjtlg" sourceRef="Activity_0ltor8a" targetRef="Gateway_1ycrdm3" />
+    <bpmn:exclusiveGateway id="Gateway_1ycrdm3">
+      <bpmn:incoming>Flow_0dnjtlg</bpmn:incoming>
+      <bpmn:outgoing>Flow_0w2ohjr</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0ols3dq</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0w2ohjr" sourceRef="Gateway_1ycrdm3" targetRef="Event_End">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=userIntent= "reserve"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:endEvent id="Event_1bp134j" name="Cancel Reservation">
+      <bpmn:extensionElements>
+        <zeebe:ioMapping>
+          <zeebe:output source="=userIntent" target="reserve_book_end_state" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0ols3dq</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0ols3dq" name="user cancelled" sourceRef="Gateway_1ycrdm3" targetRef="Event_1bp134j">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=userIntent= "reservation-cancel"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="mj-Process_reserve-book">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1jamqkh_di" bpmnElement="Activity_0ltor8a">
+        <dc:Bounds x="270" y="77" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1igo00g_di" bpmnElement="Event_End">
+        <dc:Bounds x="632" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="616" y="142" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1ycrdm3_di" bpmnElement="Gateway_1ycrdm3" isMarkerVisible="true">
+        <dc:Bounds x="445" y="92" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1bp134j_di" bpmnElement="Event_1bp134j">
+        <dc:Bounds x="632" y="212" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="621" y="255" width="59" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_19pfc8u_di" bpmnElement="Flow_19pfc8u">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="270" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0dnjtlg_di" bpmnElement="Flow_0dnjtlg">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="445" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0w2ohjr_di" bpmnElement="Flow_0w2ohjr">
+        <di:waypoint x="495" y="117" />
+        <di:waypoint x="632" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ols3dq_di" bpmnElement="Flow_0ols3dq">
+        <di:waypoint x="470" y="142" />
+        <di:waypoint x="470" y="230" />
+        <di:waypoint x="632" y="230" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="450" y="183" width="71" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
