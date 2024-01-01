@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1psb3va" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.18.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.3.0">
+  <bpmn:process id="mj-Process_reserve-book" name="Reserve Book" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_reserve-book-called" name="Reserve book-called">
+      <bpmn:extensionElements>
+        <zeebe:properties>
+          <zeebe:property name="camundaModeler:exampleOutputJson" value="{&#34;customerId&#34; : &#34;1234-uuid&#34;,&#10;&#34;bookId&#34; : &#34;isbn-1234&#34;&#10;}" />
+        </zeebe:properties>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_19pfc8u</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_19pfc8u" sourceRef="StartEvent_reserve-book-called" targetRef="Activity_reserve-book-api" />
+    <bpmn:endEvent id="Event_order-possible" name="Order possible">
+      <bpmn:extensionElements>
+        <zeebe:ioMapping>
+          <zeebe:output source="=&#34;order possible&#34;" target="reserve_book_end_state" />
+          <zeebe:output source="=reservation_db_key" target="reservationKey" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0dt6tjj</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0dnjtlg" sourceRef="Activity_reserve-book-api" targetRef="Event_book-reserved" />
+    <bpmn:sequenceFlow id="Flow_02i8fyb" sourceRef="Event_book-reserved" targetRef="Gateway_0sqtlz1" />
+    <bpmn:intermediateThrowEvent id="Event_book-reserved" name="Book reserved">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="&#34;book-reserved-message-sender&#34;" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0dnjtlg</bpmn:incoming>
+      <bpmn:outgoing>Flow_02i8fyb</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1rpdi2b" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:eventBasedGateway id="Gateway_0sqtlz1">
+      <bpmn:incoming>Flow_02i8fyb</bpmn:incoming>
+      <bpmn:outgoing>Flow_150lje5</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1fm0ljk</bpmn:outgoing>
+      <bpmn:outgoing>Flow_15morc4</bpmn:outgoing>
+    </bpmn:eventBasedGateway>
+    <bpmn:intermediateCatchEvent id="Event_book-returned" name="Book returned">
+      <bpmn:incoming>Flow_150lje5</bpmn:incoming>
+      <bpmn:outgoing>Flow_12jv1wf</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0uxznyf" messageRef="Message_2prr9fu" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_150lje5" sourceRef="Gateway_0sqtlz1" targetRef="Event_book-returned" />
+    <bpmn:intermediateCatchEvent id="Event_order-cancelled" name="Order cancelled">
+      <bpmn:incoming>Flow_1fm0ljk</bpmn:incoming>
+      <bpmn:outgoing>Flow_03kac48</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1iks1wd" messageRef="Message_144dhdf" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_1fm0ljk" sourceRef="Gateway_0sqtlz1" targetRef="Event_order-cancelled" />
+    <bpmn:intermediateCatchEvent id="Event_cancel-reservation" name="Cancel reservation">
+      <bpmn:incoming>Flow_15morc4</bpmn:incoming>
+      <bpmn:outgoing>Flow_1it94q1</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_018h2v5" messageRef="Message_0n64h3t" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_15morc4" sourceRef="Gateway_0sqtlz1" targetRef="Event_cancel-reservation" />
+    <bpmn:exclusiveGateway id="Gateway_1rkyhvk">
+      <bpmn:incoming>Flow_03kac48</bpmn:incoming>
+      <bpmn:incoming>Flow_12jv1wf</bpmn:incoming>
+      <bpmn:outgoing>Flow_0dt6tjj</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_03kac48" sourceRef="Event_order-cancelled" targetRef="Gateway_1rkyhvk" />
+    <bpmn:sequenceFlow id="Flow_0dt6tjj" sourceRef="Gateway_1rkyhvk" targetRef="Event_order-possible" />
+    <bpmn:sequenceFlow id="Flow_12jv1wf" sourceRef="Event_book-returned" targetRef="Gateway_1rkyhvk" />
+    <bpmn:sequenceFlow id="Flow_1it94q1" sourceRef="Event_cancel-reservation" targetRef="Activity_cancel-reservation-api" />
+    <bpmn:sequenceFlow id="Flow_0hmg0qg" sourceRef="Activity_cancel-reservation-api" targetRef="Event_reservation-cancelled" />
+    <bpmn:scriptTask id="Activity_reserve-book-api" name="Reserve Book API">
+      <bpmn:extensionElements>
+        <zeebe:script expression="=customerId+&#34;_&#34;+bookId+&#34;_&#34;+now()" resultVariable="reservation_db_key" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_19pfc8u</bpmn:incoming>
+      <bpmn:incoming>Flow_0yas1io</bpmn:incoming>
+      <bpmn:outgoing>Flow_0dnjtlg</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:scriptTask id="Activity_cancel-reservation-api" name="Cancel Reservation API">
+      <bpmn:extensionElements>
+        <zeebe:script expression="=reservation_db_key+&#34;_cancel&#34;" resultVariable="reservation_cancel_db_key" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1it94q1</bpmn:incoming>
+      <bpmn:outgoing>Flow_0hmg0qg</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_0yas1io" sourceRef="StartEvent_reserve-book-messaged" targetRef="Activity_reserve-book-api" />
+    <bpmn:startEvent id="StartEvent_reserve-book-messaged" name="Reserve book-messaged">
+      <bpmn:extensionElements>
+        <zeebe:properties>
+          <zeebe:property name="camundaModeler:exampleOutputJson" value="{&#34;customerId&#34; : &#34;1234-uuid&#34;,&#10;&#34;bookId&#34; : &#34;isbn-1234&#34;&#10;}" />
+        </zeebe:properties>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_0yas1io</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1uor0yx" messageRef="Message_2q96nb7" />
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_reservation-cancelled" name="Reservation cancelled">
+      <bpmn:extensionElements>
+        <zeebe:ioMapping>
+          <zeebe:output source="=userIntent" target="reserve_book_end_state" />
+          <zeebe:output source="=reservation_cancel_db_key" target="reservationCancelKey" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0hmg0qg</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1yzlzwx" />
+    </bpmn:endEvent>
+    <bpmn:textAnnotation id="TextAnnotation_0d2mr31">
+      <bpmn:text>db에다가 'bookid', 'customerid' 를 가지고 예약되었음이라고 기록을 했을 것이다. 그런데 하나의 책을 여러번 빌릴 수도 있으니까 db에는 아마도 'bookid, 'customerid', 'reserve time', 'status' 와 함게 어떤 pk로 저장했을 것이다. 그 pk 컬럼을 'reserve_id'라고 하자. 그러면 이 'reserve_id'가 message correlation key가 된다. 그리고 이 'reserve_id'가 process내에서는 'reservationKey'라는 이름으로 통용된다고 하자.</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_1mn85qn" sourceRef="Activity_reserve-book-api" targetRef="TextAnnotation_0d2mr31" />
+  </bpmn:process>
+  <bpmn:message id="Message_2q96nb7" name="Message_reserve-book" />
+  <bpmn:message id="Message_2prr9fu" name="Message_book-returned">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=reservation_db_key" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_144dhdf" name="Message_order-cancelled">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=reservation_db_key" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_0n64h3t" name="Message_cancel-reservation">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=reservation_db_key" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="mj-Process_reserve-book">
+      <bpmndi:BPMNShape id="TextAnnotation_0d2mr31_di" bpmnElement="TextAnnotation_0d2mr31">
+        <dc:Bounds x="250" y="80" width="250" height="142" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_reserve-book-called">
+        <dc:Bounds x="179" y="279" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="161" y="322" width="72" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0z1of61_di" bpmnElement="Event_book-reserved">
+        <dc:Bounds x="422" y="279" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="405" y="322" width="71" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_09044gr_di" bpmnElement="Gateway_0sqtlz1">
+        <dc:Bounds x="505" y="272" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0gebcue_di" bpmnElement="Event_book-returned">
+        <dc:Bounds x="602" y="182" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="585" y="225" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0pmt30p_di" bpmnElement="Event_order-cancelled">
+        <dc:Bounds x="602" y="279" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="582" y="322" width="78" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1wcdooo_di" bpmnElement="Event_cancel-reservation">
+        <dc:Bounds x="602" y="392" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="593" y="435" width="55" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1rkyhvk_di" bpmnElement="Gateway_1rkyhvk" isMarkerVisible="true">
+        <dc:Bounds x="685" y="272" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1igo00g_di" bpmnElement="Event_order-possible">
+        <dc:Bounds x="832" y="279" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="816" y="322" width="72" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1bda2fa_di" bpmnElement="Activity_reserve-book-api">
+        <dc:Bounds x="270" y="257" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0dpa1ft_di" bpmnElement="Activity_cancel-reservation-api">
+        <dc:Bounds x="690" y="370" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1lyxnz9_di" bpmnElement="StartEvent_reserve-book-messaged">
+        <dc:Bounds x="179" y="352" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="161" y="395" width="72" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_19znduh_di" bpmnElement="Event_reservation-cancelled">
+        <dc:Bounds x="832" y="392" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="821" y="435" width="59" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_1mn85qn_di" bpmnElement="Association_1mn85qn">
+        <di:waypoint x="316" y="257" />
+        <di:waypoint x="313" y="222" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_19pfc8u_di" bpmnElement="Flow_19pfc8u">
+        <di:waypoint x="215" y="297" />
+        <di:waypoint x="270" y="297" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0dnjtlg_di" bpmnElement="Flow_0dnjtlg">
+        <di:waypoint x="370" y="297" />
+        <di:waypoint x="422" y="297" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_02i8fyb_di" bpmnElement="Flow_02i8fyb">
+        <di:waypoint x="458" y="297" />
+        <di:waypoint x="505" y="297" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_150lje5_di" bpmnElement="Flow_150lje5">
+        <di:waypoint x="530" y="272" />
+        <di:waypoint x="530" y="200" />
+        <di:waypoint x="602" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1fm0ljk_di" bpmnElement="Flow_1fm0ljk">
+        <di:waypoint x="555" y="297" />
+        <di:waypoint x="602" y="297" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15morc4_di" bpmnElement="Flow_15morc4">
+        <di:waypoint x="530" y="322" />
+        <di:waypoint x="530" y="410" />
+        <di:waypoint x="602" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_12jv1wf_di" bpmnElement="Flow_12jv1wf">
+        <di:waypoint x="638" y="200" />
+        <di:waypoint x="710" y="200" />
+        <di:waypoint x="710" y="272" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_03kac48_di" bpmnElement="Flow_03kac48">
+        <di:waypoint x="638" y="297" />
+        <di:waypoint x="685" y="297" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1it94q1_di" bpmnElement="Flow_1it94q1">
+        <di:waypoint x="638" y="410" />
+        <di:waypoint x="690" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0dt6tjj_di" bpmnElement="Flow_0dt6tjj">
+        <di:waypoint x="735" y="297" />
+        <di:waypoint x="832" y="297" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0yas1io_di" bpmnElement="Flow_0yas1io">
+        <di:waypoint x="215" y="370" />
+        <di:waypoint x="243" y="370" />
+        <di:waypoint x="243" y="297" />
+        <di:waypoint x="270" y="297" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0hmg0qg_di" bpmnElement="Flow_0hmg0qg">
+        <di:waypoint x="790" y="410" />
+        <di:waypoint x="832" y="410" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
