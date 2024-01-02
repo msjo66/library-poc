@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1kcx7ex" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.18.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.3.0">
+  <bpmn:process id="mj-Process-Compensation-simulation" name="mj Compensation simulation" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_Order-book" name="Start Order Book">
+      <bpmn:outgoing>Flow_1spbzt1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1spbzt1" sourceRef="StartEvent_Order-book" targetRef="Activity_Order-book-api" />
+    <bpmn:sequenceFlow id="Flow_02vco6v" sourceRef="Activity_Order-book-api" targetRef="Event_Cancel-order" />
+    <bpmn:subProcess id="Activity_04pbr74" triggeredByEvent="true">
+      <bpmn:startEvent id="Event_1uo4a9q" name="Cancel Order">
+        <bpmn:outgoing>Flow_189v1w0</bpmn:outgoing>
+        <bpmn:messageEventDefinition id="MessageEventDefinition_1hr4mdv" messageRef="Message_2olacns" />
+      </bpmn:startEvent>
+      <bpmn:endEvent id="Event_13l068y" name="Cancel Order Message Received">
+        <bpmn:incoming>Flow_189v1w0</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="Flow_189v1w0" sourceRef="Event_1uo4a9q" targetRef="Event_13l068y" />
+    </bpmn:subProcess>
+    <bpmn:userTask id="Activity_Order-book-api" name="Order Book API">
+      <bpmn:incoming>Flow_1spbzt1</bpmn:incoming>
+      <bpmn:outgoing>Flow_02vco6v</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="Event_Cancel-order" name="Cancel Order">
+      <bpmn:incoming>Flow_02vco6v</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmn:message id="Message_2olacns" name="Message_Cancel-order">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=order_db_key" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_0jpc15i" name="Message_Pick-up-book">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=order_db_key" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="mj-Process-Compensation-simulation">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_Order-book">
+        <dc:Bounds x="172" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="151" y="145" width="83" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0zc4gh2_di" bpmnElement="Activity_Order-book-api">
+        <dc:Bounds x="260" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0u1t82c_di" bpmnElement="Event_Cancel-order">
+        <dc:Bounds x="472" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="458" y="145" width="66" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1rmyydw_di" bpmnElement="Activity_04pbr74" isExpanded="true">
+        <dc:Bounds x="150" y="270" width="350" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_19wsy2u_di" bpmnElement="Event_1uo4a9q">
+        <dc:Bounds x="190" y="352" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="177" y="395" width="66" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_13l068y_di" bpmnElement="Event_13l068y">
+        <dc:Bounds x="337" y="352" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="322" y="395" width="66" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_189v1w0_di" bpmnElement="Flow_189v1w0">
+        <di:waypoint x="226" y="370" />
+        <di:waypoint x="337" y="370" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1spbzt1_di" bpmnElement="Flow_1spbzt1">
+        <di:waypoint x="208" y="120" />
+        <di:waypoint x="260" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_02vco6v_di" bpmnElement="Flow_02vco6v">
+        <di:waypoint x="360" y="120" />
+        <di:waypoint x="472" y="120" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -19,11 +19,11 @@ public class BookReservedMessageAdapter {
         
         job.getVariablesAsMap().forEach( (varName, varValue) -> {
             System.out.println(varName + ":" + varValue);
-        }); 
+        });
         
         Map<String, Object> returnFromWorker = new HashMap<String, Object>();
-            returnFromWorker.put("book-reserved-messaging-result", "OK");
-            return returnFromWorker;
+        returnFromWorker.put("book-reserved-messaging-result", "OK");
+        return returnFromWorker;
     }
 
 }
