@@ -110,10 +110,13 @@
       <bpmn:incoming>Flow_book-borrowed</bpmn:incoming>
       <bpmn:outgoing>Flow_0fnuxr9</bpmn:outgoing>
     </bpmn:callActivity>
-    <bpmn:manualTask id="Activity_Return-book" name="Return book">
+    <bpmn:callActivity id="Activity_Return-book" name="Return book">
+      <bpmn:extensionElements>
+        <zeebe:calledElement processId="mj-Process-Return-book" propagateAllChildVariables="false" />
+      </bpmn:extensionElements>
       <bpmn:incoming>Flow_0fnuxr9</bpmn:incoming>
       <bpmn:outgoing>Flow_1qhe3g4</bpmn:outgoing>
-    </bpmn:manualTask>
+    </bpmn:callActivity>
   </bpmn:process>
   <bpmn:message id="Message_07bu8js" name="Message_BorrowBook" />
   <bpmn:message id="Message_2setffc" name="Message_MemberIntent">
@@ -196,7 +199,7 @@
       <bpmndi:BPMNShape id="Activity_08zkmfb_di" bpmnElement="Activity_1mtl54q">
         <dc:Bounds x="840" y="188" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1tzzopg_di" bpmnElement="Activity_Return-book">
+      <bpmndi:BPMNShape id="Activity_1bfx5db_di" bpmnElement="Activity_Return-book">
         <dc:Bounds x="1010" y="188" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_1xyl9p1_di" bpmnElement="Flow_1xyl9p1">

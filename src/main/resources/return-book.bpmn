@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0gmb40b" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.18.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.3.0">
+  <bpmn:process id="mj-Process-Return-book" name="mj Return Book" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:extensionElements>
+        <zeebe:properties>
+          <zeebe:property name="camundaModeler:exampleOutputJson" value="{&#34;customerId&#34; : &#34;msjo&#34;,&#10;&#34;bookId&#34; : &#34;isbn1234&#34;,&#10;&#34;BookStatus&#34; : &#34;borrowed&#34;&#10;}" />
+        </zeebe:properties>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_1x9n0gx</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1x9n0gx" sourceRef="StartEvent_1" targetRef="Activity_1vppjoe" />
+    <bpmn:userTask id="Activity_1vppjoe" name="Check book state">
+      <bpmn:extensionElements>
+        <zeebe:ioMapping>
+          <zeebe:output source="=charge_fee_amount" target="Var_charge_fee_amount" />
+          <zeebe:output source="=charge_fee" target="Var_charge_fee" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1x9n0gx</bpmn:incoming>
+      <bpmn:outgoing>Flow_0kpirj9</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_1p8ehd1" name="Charge fee?">
+      <bpmn:incoming>Flow_0kpirj9</bpmn:incoming>
+      <bpmn:outgoing>Flow_0sds41y</bpmn:outgoing>
+      <bpmn:outgoing>Flow_11e93ug</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0kpirj9" sourceRef="Activity_1vppjoe" targetRef="Gateway_1p8ehd1" />
+    <bpmn:exclusiveGateway id="Gateway_1p53z0a">
+      <bpmn:incoming>Flow_0sds41y</bpmn:incoming>
+      <bpmn:incoming>Flow_0onn1wm</bpmn:incoming>
+      <bpmn:outgoing>Flow_01x0c8u</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0sds41y" name="No" sourceRef="Gateway_1p8ehd1" targetRef="Gateway_1p53z0a">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=Var_charge_fee = "false"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_11e93ug" name="Yes" sourceRef="Gateway_1p8ehd1" targetRef="Activity_02hx9tj">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=Var_charge_fee = "true"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0kpas15" sourceRef="Activity_02hx9tj" targetRef="Event_1rcltei" />
+    <bpmn:intermediateThrowEvent id="Event_1rcltei" name="Charge fee for book damage">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="charge-fee-for-damage-sender" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0kpas15</bpmn:incoming>
+      <bpmn:outgoing>Flow_0onn1wm</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_16j44su" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:sequenceFlow id="Flow_0onn1wm" sourceRef="Event_1rcltei" targetRef="Gateway_1p53z0a" />
+    <bpmn:sequenceFlow id="Flow_01x0c8u" sourceRef="Gateway_1p53z0a" targetRef="Event_0x6c3om" />
+    <bpmn:endEvent id="Event_0x6c3om" name="Book returned">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="last-book-returned-sender" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_01x0c8u</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0lagvkd" />
+    </bpmn:endEvent>
+    <bpmn:manualTask id="Activity_02hx9tj" name="Charge fee">
+      <bpmn:incoming>Flow_11e93ug</bpmn:incoming>
+      <bpmn:outgoing>Flow_0kpas15</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:textAnnotation id="TextAnnotation_1fyys8z">
+      <bpmn:text>charge_fee 와 charge_fee_amount 가 아웃풋으로 나와야함</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_0zw8th2" sourceRef="Activity_1vppjoe" targetRef="TextAnnotation_1fyys8z" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="mj-Process-Return-book">
+      <bpmndi:BPMNShape id="TextAnnotation_1fyys8z_di" bpmnElement="TextAnnotation_1fyys8z">
+        <dc:Bounds x="270" y="30" width="140" height="55" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="169" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1n2bz0m_di" bpmnElement="Activity_1vppjoe">
+        <dc:Bounds x="270" y="147" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1p8ehd1_di" bpmnElement="Gateway_1p8ehd1" isMarkerVisible="true">
+        <dc:Bounds x="425" y="162" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="420" y="132" width="61" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1ic4nph_di" bpmnElement="Event_1rcltei">
+        <dc:Bounds x="712" y="282" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="695" y="325" width="71" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1p53z0a_di" bpmnElement="Gateway_1p53z0a" isMarkerVisible="true">
+        <dc:Bounds x="705" y="162" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0q2ynuv_di" bpmnElement="Event_0x6c3om">
+        <dc:Bounds x="992" y="169" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="975" y="212" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0o7x6aj_di" bpmnElement="Activity_02hx9tj">
+        <dc:Bounds x="540" y="260" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_0zw8th2_di" bpmnElement="Association_0zw8th2">
+        <di:waypoint x="320" y="147" />
+        <di:waypoint x="320" y="85" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1x9n0gx_di" bpmnElement="Flow_1x9n0gx">
+        <di:waypoint x="215" y="187" />
+        <di:waypoint x="270" y="187" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0kpirj9_di" bpmnElement="Flow_0kpirj9">
+        <di:waypoint x="370" y="187" />
+        <di:waypoint x="425" y="187" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0sds41y_di" bpmnElement="Flow_0sds41y">
+        <di:waypoint x="475" y="187" />
+        <di:waypoint x="705" y="187" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="586" y="169" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11e93ug_di" bpmnElement="Flow_11e93ug">
+        <di:waypoint x="450" y="212" />
+        <di:waypoint x="450" y="300" />
+        <di:waypoint x="540" y="300" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="456" y="253" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0kpas15_di" bpmnElement="Flow_0kpas15">
+        <di:waypoint x="640" y="300" />
+        <di:waypoint x="712" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0onn1wm_di" bpmnElement="Flow_0onn1wm">
+        <di:waypoint x="730" y="282" />
+        <di:waypoint x="730" y="212" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_01x0c8u_di" bpmnElement="Flow_01x0c8u">
+        <di:waypoint x="755" y="187" />
+        <di:waypoint x="992" y="187" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
