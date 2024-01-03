@@ -47,6 +47,9 @@
     <bpmn:endEvent id="Event_Book-borrowed" name="Book borrowed">
       <bpmn:extensionElements>
         <zeebe:taskDefinition type="event-book-borrowed" />
+        <zeebe:ioMapping>
+          <zeebe:output source="=&#34;book borrowed&#34;" target="order_book_end_state" />
+        </zeebe:ioMapping>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0b12br6</bpmn:incoming>
       <bpmn:messageEventDefinition id="MessageEventDefinition_01qzk7e" />
@@ -108,6 +111,9 @@
     <bpmn:endEvent id="Event_1td4ipr" name="Order Cancelled">
       <bpmn:extensionElements>
         <zeebe:taskDefinition type="event-order-cancelled-no-pickup" />
+        <zeebe:ioMapping>
+          <zeebe:output source="=&#34;order cancelled&#34;" target="order_book_end_state" />
+        </zeebe:ioMapping>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1pq2idw</bpmn:incoming>
       <bpmn:messageEventDefinition id="MessageEventDefinition_18g0rv2" />
@@ -161,6 +167,9 @@
       <bpmn:endEvent id="Event_0wxeds4" name="Order Cancelled">
         <bpmn:extensionElements>
           <zeebe:taskDefinition type="event-order-cancelled-no-pickup" />
+          <zeebe:ioMapping>
+            <zeebe:output source="=&#34;order cancelled&#34;" target="order_book_end_state" />
+          </zeebe:ioMapping>
         </bpmn:extensionElements>
         <bpmn:incoming>Flow_1on2sno</bpmn:incoming>
         <bpmn:messageEventDefinition id="MessageEventDefinition_021u1e3" />
