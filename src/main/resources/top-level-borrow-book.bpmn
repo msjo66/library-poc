@@ -1,6 +1,193 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.18.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.4.0" camunda:diagramRelationId="2b165b7e-f373-45ed-b480-fa9c496e7a1a">
   <bpmn:process id="mj-Process_top-level-borrow-book" name="mj-Top-Level Borrow Book" isExecutable="true">
+    <bpmn:extensionElements>
+      <zeebe:userTaskForm id="UserTaskForm_20mmlpc">{
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.3.0",
+  "exporter": {
+    "name": "Camunda Web Modeler",
+    "version": "50c6516"
+  },
+  "schemaVersion": 14,
+  "id": "borrow-book-0yef0r1",
+  "components": [
+    {
+      "text": "# 책 대출 정보 입력",
+      "label": "Text view",
+      "type": "text",
+      "layout": {
+        "row": "Row_10xrjj1",
+        "columns": null
+      },
+      "id": "Field_1al9d1m"
+    },
+    {
+      "label": "고객번호",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_0k6kjmm",
+        "columns": null
+      },
+      "id": "Field_094lmsb",
+      "key": "customerId",
+      "defaultValue": "msjo",
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "책 ISBN",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_1dre20p",
+        "columns": null
+      },
+      "id": "Field_1m8c4vq",
+      "key": "bookId",
+      "defaultValue": "isbn1234",
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "values": [
+        {
+          "label": "대여가능",
+          "value": "available"
+        },
+        {
+          "label": "이미 예약됨",
+          "value": "reserved"
+        },
+        {
+          "label": "누군가 먼저 주문",
+          "value": "ordered"
+        },
+        {
+          "label": "누군가 먼저 빌려감",
+          "value": "borrowed"
+        }
+      ],
+      "label": "현재 책 상태",
+      "type": "select",
+      "layout": {
+        "row": "Row_08fwqsp",
+        "columns": null
+      },
+      "id": "Field_0hxnx63",
+      "key": "BookStatus",
+      "defaultValue": "available",
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "values": [
+        {
+          "label": "예약할래요",
+          "value": "reserve"
+        },
+        {
+          "label": "포기",
+          "value": "giveup"
+        }
+      ],
+      "label": "즉시 대여 불가시 나의 선택",
+      "type": "select",
+      "layout": {
+        "row": "Row_1cvo94w",
+        "columns": null
+      },
+      "id": "Field_1g43fld",
+      "key": "Var_MmbrIntent",
+      "defaultValue": "reserve",
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "text": "##### 프로세스 시뮬레이션용 데이타",
+      "label": "Text view",
+      "type": "text",
+      "layout": {
+        "row": "Row_0tze75j",
+        "columns": null
+      },
+      "id": "Field_1evixit"
+    },
+    {
+      "values": [
+        {
+          "label": "true",
+          "value": "true"
+        },
+        {
+          "label": "false",
+          "value": "false"
+        }
+      ],
+      "label": "waiting simulation?",
+      "type": "radio",
+      "layout": {
+        "row": "Row_0jn6le0",
+        "columns": null
+      },
+      "id": "Field_1xln93j",
+      "key": "waitingSimulation",
+      "defaultValue": "true"
+    },
+    {
+      "label": "주문후 가져갈 때까지 기다리는 시간",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_1yyu9ae",
+        "columns": null
+      },
+      "id": "Field_16460yu",
+      "key": "waitTime",
+      "defaultValue": "P3D",
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "빌려간 후 첫번째 노티시간",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_018kbb0",
+        "columns": null
+      },
+      "id": "Field_12yqm0g",
+      "key": "sevenDWaitSimulation",
+      "defaultValue": "PT7S"
+    },
+    {
+      "label": "빌려간 후 두번째 노티시간",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_018kbb0",
+        "columns": null
+      },
+      "id": "Field_1wdyyox",
+      "key": "oneDWaitSimulation",
+      "defaultValue": "PT5S"
+    },
+    {
+      "label": "빌려간 후 마지막 노티 시간",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_018kbb0",
+        "columns": null
+      },
+      "id": "Field_0i22u7m",
+      "key": "deadLineSimulation",
+      "defaultValue": "PT3S"
+    }
+  ],
+  "type": "default"
+}</zeebe:userTaskForm>
+    </bpmn:extensionElements>
     <bpmn:exclusiveGateway id="Gateway_1ma8y94" name="Book status">
       <bpmn:incoming>Flow_1xyl9p1</bpmn:incoming>
       <bpmn:outgoing>Flow_reserved</bpmn:outgoing>
@@ -57,9 +244,7 @@
     </bpmn:callActivity>
     <bpmn:startEvent id="StartEvent_BorrowBook" name="Borrow book">
       <bpmn:extensionElements>
-        <zeebe:properties>
-          <zeebe:property name="camundaModeler:exampleOutputJson" value="{&#34;customerId&#34; : &#34;msjo&#34;,&#10;&#34;bookId&#34; : &#34;isbn1234&#34;,&#10;&#34;BookStatus&#34; : &#34;borrowed&#34;,&#10;&#34;Var_MmbrIntent&#34; : &#34;reserve&#34;,&#10;&#34;waitTime&#34; : &#34;P3D&#34;&#10;}" />
-        </zeebe:properties>
+        <zeebe:formDefinition formKey="camunda-forms:bpmn:UserTaskForm_20mmlpc" />
       </bpmn:extensionElements>
       <bpmn:outgoing>Flow_1xyl9p1</bpmn:outgoing>
     </bpmn:startEvent>
@@ -80,6 +265,7 @@
           <zeebe:input source="=customerId" target="customerId" />
           <zeebe:input source="=bookId" target="bookId" />
           <zeebe:input source="=waitTime" target="waitTime" />
+          <zeebe:input source="=waitingSimulation" target="waitingSimulation" />
           <zeebe:output source="=order_book_end_state" target="order_book_end_state" />
         </zeebe:ioMapping>
       </bpmn:extensionElements>
@@ -105,14 +291,26 @@
     <bpmn:sequenceFlow id="Flow_1qhe3g4" sourceRef="Activity_Return-book" targetRef="Event_1llag5b" />
     <bpmn:callActivity id="Activity_1mtl54q" name="Manage borrowed book">
       <bpmn:extensionElements>
-        <zeebe:calledElement processId="mj-Process-Manage-borrowed-book" propagateAllChildVariables="false" />
+        <zeebe:calledElement processId="mj-Process-Manage-borrowed-book" propagateAllChildVariables="false" propagateAllParentVariables="false" />
+        <zeebe:ioMapping>
+          <zeebe:input source="=customerId" target="customerId" />
+          <zeebe:input source="=bookId" target="bookId" />
+          <zeebe:input source="=waitingSimulation" target="waitingSimulation" />
+          <zeebe:input source="=sevenDWaitSimulation" target="sevenDWaitSimulation" />
+          <zeebe:input source="=oneDWaitSimulation" target="oneDWaitSimulation" />
+          <zeebe:input source="=deadLineSimulation" target="deadLineSimulation" />
+        </zeebe:ioMapping>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_book-borrowed</bpmn:incoming>
       <bpmn:outgoing>Flow_0fnuxr9</bpmn:outgoing>
     </bpmn:callActivity>
     <bpmn:callActivity id="Activity_Return-book" name="Return book">
       <bpmn:extensionElements>
-        <zeebe:calledElement processId="mj-Process-Return-book" propagateAllChildVariables="false" />
+        <zeebe:calledElement processId="mj-Process-Return-book" propagateAllChildVariables="false" propagateAllParentVariables="false" />
+        <zeebe:ioMapping>
+          <zeebe:input source="=customerId" target="customerId" />
+          <zeebe:input source="=bookId" target="bookId" />
+        </zeebe:ioMapping>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0fnuxr9</bpmn:incoming>
       <bpmn:outgoing>Flow_1qhe3g4</bpmn:outgoing>
@@ -136,12 +334,6 @@
   </bpmn:message>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="mj-Process_top-level-borrow-book">
-      <bpmndi:BPMNShape id="Event_1w20oof_di" bpmnElement="StartEvent_BorrowBook">
-        <dc:Bounds x="192" y="210" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="179" y="253" width="62" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_1ma8y94_di" bpmnElement="Gateway_1ma8y94" isMarkerVisible="true">
         <dc:Bounds x="325" y="203" width="50" height="50" />
         <bpmndi:BPMNLabel>
@@ -153,9 +345,6 @@
         <bpmndi:BPMNLabel>
           <dc:Bounds x="415" y="125" width="90" height="14" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_14qf5mr_di" bpmnElement="Activity_1llljs4">
-        <dc:Bounds x="570" y="188" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_0fd7l8c_di" bpmnElement="Gateway_0fd7l8c" isMarkerVisible="true">
         <dc:Bounds x="325" y="365" width="50" height="50" />
@@ -184,6 +373,18 @@
       <bpmndi:BPMNShape id="Activity_0pmlm4g_di" bpmnElement="activity_reserveBook">
         <dc:Bounds x="300" y="500" width="100" height="80" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1w20oof_di" bpmnElement="StartEvent_BorrowBook">
+        <dc:Bounds x="192" y="210" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="179" y="253" width="62" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1llag5b_di" bpmnElement="Event_1llag5b">
+        <dc:Bounds x="1182" y="210" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_14qf5mr_di" bpmnElement="Activity_1llljs4">
+        <dc:Bounds x="570" y="188" width="100" height="80" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_1yf4s3m_di" bpmnElement="Gateway_1yf4s3m" isMarkerVisible="true">
         <dc:Bounds x="705" y="203" width="50" height="50" />
       </bpmndi:BPMNShape>
@@ -192,9 +393,6 @@
         <bpmndi:BPMNLabel>
           <dc:Bounds x="791" y="365" width="78" height="14" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1llag5b_di" bpmnElement="Event_1llag5b">
-        <dc:Bounds x="1182" y="210" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_08zkmfb_di" bpmnElement="Activity_1mtl54q">
         <dc:Bounds x="840" y="188" width="100" height="80" />
