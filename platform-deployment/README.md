@@ -178,3 +178,9 @@ nohup kubectl port-forward svc/camunda-platform-connectors 8088:8080 &
     위 -L 다음의 해석은 '내 PC에 8081로 들어오는 요청은 camunda-sandbox.amazonaws.com 서버로 접속한 이 ssh 접속을 이용해서 localhost:8081 즉, camunda-sandbox.amazonaws.com의 8081로 포트를 forward하라' 는 뜻이다.
 
     e. PC에서 브라우저를 열어서 http://localhost:8081 을 하면 operate web 화면이 나오고 8082는 tasklist화면이 나온다. job worker를 local pc에서 띄우게 되면 job worker는 26500 port(zeebe gateway)를 통해서 grpc 통신을 하게 된다.
+
+7. upgrade
+  ```
+  helm upgrade camunda-platform camunda/camunda-platform
+  ```
+  각 pod들이 서서히 업그레이드 되면서 이전 버전의 pod들은 서서히 없어짐
