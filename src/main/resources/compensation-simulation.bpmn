@@ -1,28 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1kcx7ex" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.18.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.3.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1kcx7ex" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.19.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.3.0">
   <bpmn:process id="mj-Process-Compensation-simulation" name="mj Compensation simulation" isExecutable="true">
-    <bpmn:startEvent id="StartEvent_Order-book" name="Start Order Book">
+    <bpmn:startEvent id="StartEvent_Order-book" name="Start">
       <bpmn:outgoing>Flow_1spbzt1</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:sequenceFlow id="Flow_1spbzt1" sourceRef="StartEvent_Order-book" targetRef="Activity_Order-book-api" />
-    <bpmn:sequenceFlow id="Flow_02vco6v" sourceRef="Activity_Order-book-api" targetRef="Event_Cancel-order" />
-    <bpmn:subProcess id="Activity_04pbr74" triggeredByEvent="true">
-      <bpmn:startEvent id="Event_1uo4a9q" name="Cancel Order">
-        <bpmn:outgoing>Flow_189v1w0</bpmn:outgoing>
-        <bpmn:messageEventDefinition id="MessageEventDefinition_1hr4mdv" messageRef="Message_2olacns" />
-      </bpmn:startEvent>
-      <bpmn:endEvent id="Event_13l068y" name="Cancel Order Message Received">
-        <bpmn:incoming>Flow_189v1w0</bpmn:incoming>
-      </bpmn:endEvent>
-      <bpmn:sequenceFlow id="Flow_189v1w0" sourceRef="Event_1uo4a9q" targetRef="Event_13l068y" />
-    </bpmn:subProcess>
-    <bpmn:userTask id="Activity_Order-book-api" name="Order Book API">
+    <bpmn:sequenceFlow id="Flow_1spbzt1" sourceRef="StartEvent_Order-book" targetRef="Activity_Happy-api" />
+    <bpmn:sequenceFlow id="Flow_02vco6v" sourceRef="Activity_Happy-api" targetRef="Gateway_1n6j2f8" />
+    <bpmn:endEvent id="Event_End" name="End">
+      <bpmn:incoming>Flow_0q6dbiv</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="Activity_Happy-api" name="Happy API">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="happy-api" />
+      </bpmn:extensionElements>
       <bpmn:incoming>Flow_1spbzt1</bpmn:incoming>
       <bpmn:outgoing>Flow_02vco6v</bpmn:outgoing>
-    </bpmn:userTask>
-    <bpmn:endEvent id="Event_Cancel-order" name="Cancel Order">
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_1n6j2f8" default="Flow_0q6dbiv">
       <bpmn:incoming>Flow_02vco6v</bpmn:incoming>
+      <bpmn:outgoing>Flow_0q6dbiv</bpmn:outgoing>
+      <bpmn:outgoing>Flow_03kteis</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0q6dbiv" sourceRef="Gateway_1n6j2f8" targetRef="Event_End" />
+    <bpmn:sequenceFlow id="Flow_03kteis" name="rollback" sourceRef="Gateway_1n6j2f8" targetRef="Event_06ym8p5">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=rollback = "true"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:boundaryEvent id="Event_1an9wu8" attachedToRef="Activity_Happy-api">
+      <bpmn:compensateEventDefinition id="CompensateEventDefinition_07cyiy9" />
+    </bpmn:boundaryEvent>
+    <bpmn:serviceTask id="Activity_Rollback-api" name="Rollback API" isForCompensation="true">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="rollback-api" />
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="Event_0uw2h4u" name="Something wrong">
+      <bpmn:incoming>Flow_1amzi1t</bpmn:incoming>
     </bpmn:endEvent>
+    <bpmn:intermediateThrowEvent id="Event_06ym8p5">
+      <bpmn:incoming>Flow_03kteis</bpmn:incoming>
+      <bpmn:outgoing>Flow_1amzi1t</bpmn:outgoing>
+      <bpmn:compensateEventDefinition id="CompensateEventDefinition_1vw2ro0" activityRef="Activity_Happy-api" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:sequenceFlow id="Flow_1amzi1t" sourceRef="Event_06ym8p5" targetRef="Event_0uw2h4u" />
+    <bpmn:association id="Association_1jaguv2" associationDirection="One" sourceRef="Event_1an9wu8" targetRef="Activity_Rollback-api" />
   </bpmn:process>
   <bpmn:message id="Message_2olacns" name="Message_Cancel-order">
     <bpmn:extensionElements>
@@ -39,44 +59,64 @@
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_Order-book">
         <dc:Bounds x="172" y="102" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="151" y="145" width="83" height="14" />
+          <dc:Bounds x="181" y="145" width="24" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0zc4gh2_di" bpmnElement="Activity_Order-book-api">
+      <bpmndi:BPMNShape id="Activity_1s870kn_di" bpmnElement="Activity_Happy-api">
         <dc:Bounds x="260" y="80" width="100" height="80" />
+        <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0u1t82c_di" bpmnElement="Event_Cancel-order">
-        <dc:Bounds x="472" y="102" width="36" height="36" />
+      <bpmndi:BPMNShape id="Event_0u1t82c_di" bpmnElement="Event_End">
+        <dc:Bounds x="532" y="102" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="458" y="145" width="66" height="14" />
+          <dc:Bounds x="541" y="145" width="20" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1rmyydw_di" bpmnElement="Activity_04pbr74" isExpanded="true">
-        <dc:Bounds x="150" y="270" width="350" height="200" />
+      <bpmndi:BPMNShape id="Gateway_1n6j2f8_di" bpmnElement="Gateway_1n6j2f8" isMarkerVisible="true">
+        <dc:Bounds x="395" y="95" width="50" height="50" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_19wsy2u_di" bpmnElement="Event_1uo4a9q">
-        <dc:Bounds x="190" y="352" width="36" height="36" />
+      <bpmndi:BPMNShape id="Activity_046zagc_di" bpmnElement="Activity_Rollback-api">
+        <dc:Bounds x="330" y="260" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1298kom_di" bpmnElement="Event_06ym8p5">
+        <dc:Bounds x="412" y="212" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1hgq0mi_di" bpmnElement="Event_0uw2h4u">
+        <dc:Bounds x="532" y="212" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="177" y="395" width="66" height="14" />
+          <dc:Bounds x="509" y="255" width="86" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_13l068y_di" bpmnElement="Event_13l068y">
-        <dc:Bounds x="337" y="352" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="322" y="395" width="66" height="40" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_189v1w0_di" bpmnElement="Flow_189v1w0">
-        <di:waypoint x="226" y="370" />
-        <di:waypoint x="337" y="370" />
+      <bpmndi:BPMNEdge id="Association_1jaguv2_di" bpmnElement="Association_1jaguv2">
+        <di:waypoint x="300" y="178" />
+        <di:waypoint x="300" y="300" />
+        <di:waypoint x="330" y="300" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_1h9iyuh_di" bpmnElement="Event_1an9wu8">
+        <dc:Bounds x="282" y="142" width="36" height="36" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_1spbzt1_di" bpmnElement="Flow_1spbzt1">
         <di:waypoint x="208" y="120" />
         <di:waypoint x="260" y="120" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_02vco6v_di" bpmnElement="Flow_02vco6v">
         <di:waypoint x="360" y="120" />
-        <di:waypoint x="472" y="120" />
+        <di:waypoint x="395" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0q6dbiv_di" bpmnElement="Flow_0q6dbiv">
+        <di:waypoint x="445" y="120" />
+        <di:waypoint x="532" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_03kteis_di" bpmnElement="Flow_03kteis">
+        <di:waypoint x="420" y="145" />
+        <di:waypoint x="420" y="215" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="416" y="177" width="38" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1amzi1t_di" bpmnElement="Flow_1amzi1t">
+        <di:waypoint x="448" y="230" />
+        <di:waypoint x="532" y="230" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
