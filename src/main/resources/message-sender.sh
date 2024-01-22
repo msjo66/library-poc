@@ -1,7 +1,8 @@
-#ZEEBE_ADDRESS=localhost:26500
-#ZEEBE_SECURE_CONNECTION=false
-#ZEEBE_BASIC_AUTH_PASSWORD=demo
-#ZEEBE_BASIC_AUTH_USERNAME=demo
+ZEEBE_CLIENT_ID=msjo-client
+ZEEBE_CLIENT_SECRET=
+ZEEBE_INSECURE_CONNECTION=true
+ZEEBE_TOKEN_AUDIENCE=zeebe-api
+ZEEBE_AUTHORIZATION_SERVER_URL=http://localhost:18080/auth/realms/camunda-platform/protocol/openid-connect/token
 
 # "Cancel reservation 메세지 보내기"
 zbctl --insecure publish message "Message_cancel-reservation" --correlationKey "isbn1234_msjo" --variables "{\"from\" : \"zbctl\" }"
