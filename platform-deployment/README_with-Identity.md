@@ -40,7 +40,7 @@ kubectl config use-context kind-camunda-platform-local
 ```
 
 4. Deploy Camunda platform
-Identity를 enable할 때에는 아래와 같이 yaml을 수정하면 된다.
+Identity를 enable할 때에는 아래와 같이 yaml을 수정하면 된다. connector의 env는 plaintext로의 접속으로 인한 WARN을 줄이기 위함이다.
 
 ```
 global:
@@ -72,6 +72,9 @@ connectors:
   enabled: true
   inbound:
     mode: disabled
+  env:
+    - name: JAVA_OPTS
+      value: "-Dlogging.level.io.camunda.zeebe.client.impl.ZeebeCallCredentials=ERROR"
 
 elasticsearch:
   master:
